@@ -59,6 +59,7 @@ HttpListenerResponse res, Hashtable props, Func<Task> next)
             Environment.GetEnvironmentVariable("DEPLOYMENT_MODE") == "production"
             ? "An unexpected error occurred." : e.ToString();
             await SendResponse(req, res, props, code, message, "text/plain");
+            Console.Error.WriteLine($"Error processing request {req.HttpMethod} {req.Url}: {e}");
         }
     }
     public static async Task DefaultResponse(HttpListenerRequest req,
@@ -74,7 +75,7 @@ HttpListenerResponse res, Hashtable props, Func<Task> next)
     public static async Task ServeStaticFiles(HttpListenerRequest req,
 HttpListenerResponse res, Hashtable props, Func<Task> next)
     {
-        string rootDir = Configuration.Get("root.dir",
+        string rootDir = Configuration.Get("wwwroot.dir",
         Directory.GetCurrentDirectory())!;
         string urlPath = req.Url!.AbsolutePath.TrimStart('/');
         string filePath = Path.Combine(rootDir, urlPath.Replace('/',
